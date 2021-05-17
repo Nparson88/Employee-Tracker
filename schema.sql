@@ -8,6 +8,8 @@ CREATE TABLE Employee (
     role_id INT
     first_name VARCHAR(30) NOT NULL
     last_name VARCHAR(30) NOT NULL
+    FOREIGN KEY (role_id) REFERENCES role(id),
+    FOREIGN KEY (manager_id) REFERENCES employee(id)
 
 )
 CREATE TABLE Role (
@@ -48,4 +50,6 @@ INSERT INTO Employee(first_name, last_name role_id)
             ("Lois", "Lane", 1)
             ("Pepper" "Potts" 2)
             ("Lex","Luthor" 4)
-        
+SELECT * FROM Department;
+SELECT * FROM Role;
+SELECT * FROM Employee;
