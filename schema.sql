@@ -24,29 +24,29 @@ CREATE TABLE employee (
    FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
 ​
-INSERT INTO department (name)
-   value  ("Management"),
-           ("Sales"),
-           ("Engineering"),
-           ("Production"),
-           ("Shipping");
-INSERT INTO role(title, salary, department_id)
-   value ("Foreman", 80000, 1),
-           ("HR Representative", 75000, 1),
-           ("Lead Engineer", 100000, 3),
-           ("Engineer", 60000, 3),
-           ("Sales Representative", 65000, 2),
-           ("Fabricator", 45000, 4),
-           ("Machine Operator", 32000, 4),
-           ("Logistics Manager", 40000, 5);
-INSERT INTO employee(first_name, last_name, role_id)
-   value ("J. Jonah", "Jameson", 1),
-           ("Peter", "Parker" , 4),
-           ("Bruce", "Banner", 3),
-           ("Stephen", "Strange", 5),
-           ("Lois", "Lane", 2),
-           ("Pepper", "Potts", 5),
-           ("Lex","Luthor", 6);
+INSERT INTO department (id,name)
+   value  (1,"Management"),
+           (2,"Sales"),
+           (3,"Engineering"),
+           (4,"Production"),
+           (5,"Shipping");
+INSERT INTO role(id,title, salary, department_id)
+   value (1,"Foreman", 80000, 1),
+           (2,"HR Representative", 75000, 1),
+           (3,"Lead Engineer", 100000, 3),
+           (4,"Engineer", 60000, 3),
+           (5,"Sales Representative", 65000, 2),
+           (6,"Fabricator", 45000, 4),
+           (7,"Machine Operator", 32000, 4),
+           (8,"Logistics Manager", 40000, 5);
+INSERT INTO employee(first_name, last_name, manager_id, role_id)
+   value ("J. Jonah", "Jameson", null, 1),
+           ("Peter", "Parker" ,2, 4),
+           ("Bruce", "Banner", null, 3),
+           ("Stephen", "Strange", 1, 5),
+           ("Lois", "Lane", null, 2),
+           ("Pepper", "Potts",1, 5),
+           ("Lex","Luthor",1, 6);
            
 SELECT * FROM department;
 SELECT * FROM role;

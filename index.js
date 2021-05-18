@@ -1,10 +1,7 @@
 const inquirer = require('inquirer')
 const mySQL = require('mysql')
 const consoleTable = require('console.table')
-const managers = ['J. Jonah Jameson', 'Bruce Banner']
-//const { listenerCount } = require('node:events')
-//const { resolveSoa } = require('node:dns')
-//const { allowedNodeEnvironmentFlags } = require('node:process')
+
 
 const connection = mySQL.createConnection({
     host: 'localhost',
@@ -26,8 +23,8 @@ const appStart = () => {
         choices: ['Add employee',
         'Update employee',
         'All employees',
-        'Sort employees by role',
-        'Sort employees by department',
+        'View all roles',
+        'View all departments',
         'Add new role',
         'Add new department',
             'finished'
@@ -44,10 +41,10 @@ const appStart = () => {
             case "All employees":
                 employeeList();
                 break;
-            case "Sort employees by role":
+            case "View all roles":
                 roles();
                 break;
-            case "Sort employees by department":
+            case "View all departments":
                 departments();
                 break;
             case "Add new role":
@@ -57,7 +54,7 @@ const appStart = () => {
                 addDepartment();
                 break;
             case "finished":
-                allDone();
+              connection.end()
                 break;
 
         }
@@ -76,67 +73,58 @@ const addEmployee = () => {
             message: 'last name of new employee'
         },
         {
-            type: 'list',
+            type: 'input',
             name: 'role',
-            message: 'Job title/role of new employee',
-            choices: roles()
+            message: 'Role ID of new employee',
         },
         {
-            type: 'list',
+            type: 'input',
             name: 'ManageAssign',
-            message: "New employee's manager",
-            choices: managers
+            message: "New employee's managerID",
         }
 
     ]).then((res) => {
-       connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [res.firstName, res.lastName, res.role, res.manageAssign]', 
-       (err, res) => {
+        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [res.firstName, res.lastName, res.role, res.manageAssign],
+         (err, res) => {
         if (err) throw err;
         console.table(res)
         appStart()
        })
     })
 }
-const employeeUpdate = () => {
-    connection.query('SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id;')
+const employeeUpdate = () =>{
     inquirer.prompt([
         {
-            name: "lastName",
-            type: "rawlist",
-            choices: () => {
-                const lastNames = []
-                for (var i = 0; i < res.length; i++) {
-                    lastNames.push(res[i].last_name)
-                }
-                return lastNames;
-            },
-            message: "Last name of desired employee? ",
-        },
-        {
-            name: "newRole",
-            type: "rawlist",
-            message: "new title of selected employee ",
-            choices: roles()
-        },
-    ]).then((res) => {
-        var roleId = selectRole().indexOf(res.role) + 1
-        connection.query("UPDATE employee SET WHERE ?",
+            type : 'input',
+            name : 'id',
+            message: "ID of employee you wish to update",
+        }
+      ])
+        .then((res) => {
+    
+          const newId = res.id
+          inquirer.prompt([
             {
-                last_name: val.lastName
-            },
-            {
-                role_id: roleId
-            },
-            (err) => {
-                if (err) throw err
-                console.table(res)
-                appStart()
-            })
-
-    })
-}
+              name: "role",
+              type: "input",
+              message: "Updated role ID of employee ",
+            }
+          ])
+            .then((res) => {
+    
+              const updatedRole = res.role
+              const data = "UPDATE employee SET role_id=? WHERE id=?"
+                connection.query(data, [updatedRole, newId], 
+                (err, res) => {
+                if (err) throw err;
+                console.table(res);
+                appStart();
+              });
+            });
+        });
+    }
 const employeeList = () => {
-    connection.query ('SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name AS department FROM employee LEFT JOIN role ON (employee.role_id = role.id) LEFT JOIN department ON (department.id = role.department_id)',
+    connection.query ('SELECT employee.id, employee.manager_id,employee.first_name, employee.last_name, role.title, role.salary, department.name AS department FROM employee LEFT JOIN role ON (employee.role_id = role.id) LEFT JOIN department ON (department.id = role.department_id)',
     (err,res) => {
         if (err) throw err
     console.table(res)
@@ -144,7 +132,7 @@ const employeeList = () => {
 })
 }
 const roles = () => {
-    connection.query('SELECT employee.first_name, employee.last_name, role.title AS title FROM employee JOIN role ON employee.role_id = role.id;', 
+    connection.query('SELECT * FROM role', 
     (err,res) => {
         if (err) throw err
     console.table(res)
@@ -152,7 +140,7 @@ const roles = () => {
 })
 }
 const departments = () => {
-    connection.query('SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;',
+    connection.query('SELECT * FROM department',
     (err,res) => {
         if (err) throw err
     console.table(res)
@@ -172,12 +160,18 @@ const addRole = () => {
             type: 'input',
             name: 'salary',
             message: 'Salary of new title'
+        },
+        {
+            type: 'input',
+            name: 'id',
+            message: 'Add department id'
         }
     ]).then((res) => {
         connection.query('INSERT INTO role SET ?',
             {
                 title: res.title,
-                salary: res.salary
+                salary: res.salary,
+                department_id: res.id
             },
             (err) => {
                 if (err) throw err
@@ -192,11 +186,17 @@ const addDepartment = () => {
             type: 'input',
             name: 'newDep',
             message: 'Name of new department'
+        },
+        {
+            type: 'input',
+            name : 'id',
+            message: 'assign a number for department id'
         }
     ]).then((res) => {
         connection.query('INSERT INTO department SET ?',
             {
-                name: res.name
+                name: res.newDep,
+                id : res.id
             },
             (err) => {
                 if (err) throw err
