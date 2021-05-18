@@ -41,12 +41,12 @@ INSERT INTO role(title, salary, department_id)
            ("Logistics Manager", 40000, 5);
 INSERT INTO employee(first_name, last_name, role_id)
    value ("J. Jonah", "Jameson", 1),
-           ("Peter", "Parker" , 2),
-           ("Bruce", "Banner", 2),
-           ("Stephen", "Strange", 3),
-           ("Lois", "Lane", 1),
-           ("Pepper", "Potts", 2),
-           ("Lex","Luthor", 4);
+           ("Peter", "Parker" , 4),
+           ("Bruce", "Banner", 3),
+           ("Stephen", "Strange", 5),
+           ("Lois", "Lane", 2),
+           ("Pepper", "Potts", 5),
+           ("Lex","Luthor", 6);
            
 SELECT * FROM department;
 SELECT * FROM role;

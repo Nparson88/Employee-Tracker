@@ -1,6 +1,7 @@
 const inquirer = require('inquirer')
 const mySQL = require('mysql')
 const consoleTable = require('console.table')
+const managers = ['J. Jonah Jameson', 'Bruce Banner']
 //const { listenerCount } = require('node:events')
 //const { resolveSoa } = require('node:dns')
 //const { allowedNodeEnvironmentFlags } = require('node:process')
@@ -84,29 +85,20 @@ const addEmployee = () => {
             type: 'list',
             name: 'ManageAssign',
             message: "New employee's manager",
-            choices: managers()
+            choices: managers
         }
 
     ]).then((res) => {
-        const roleId = roles().indexOf(res.role) + 1
-        const managerId = managers().indexOf(res.manageAssign) + 1
-        const query = 'INSERT INTO employees SET ?'
-        connection.query(query,
-            {
-                first_name: res.firstName,
-                last_name: res.lastName,
-                role_id: roleId,
-                manager_id: managerId,
-            },
-            (err) => {
-                if (err) throw err
-                console.table(res)
-                appStart()
-            })
+       connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [res.firstName, res.lastName, res.role, res.manageAssign]', 
+       (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        appStart()
+       })
     })
 }
 const employeeUpdate = () => {
-    connection.query('SELECT employees.last_name, role.title FROM employees JOIN role ON employee.role_id;')
+    connection.query('SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id;')
     inquirer.prompt([
         {
             name: "lastName",
@@ -128,7 +120,7 @@ const employeeUpdate = () => {
         },
     ]).then((res) => {
         var roleId = selectRole().indexOf(res.role) + 1
-        connection.query("UPDATE employees SET WHERE ?",
+        connection.query("UPDATE employee SET WHERE ?",
             {
                 last_name: val.lastName
             },
@@ -144,26 +136,28 @@ const employeeUpdate = () => {
     })
 }
 const employeeList = () => {
-    connection.query() = 'SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name AS department ';
-    query += 'FROM employee LEFT JOIN role ON (employee.role_id = role.id) '
-    query += 'LEFT JOIN department ON (department.id = role.department_id)'
-    const result = connection.query(res)
-    console.table(result)
+    connection.query ('SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name AS department FROM employee LEFT JOIN role ON (employee.role_id = role.id) LEFT JOIN department ON (department.id = role.department_id)',
+    (err,res) => {
+        if (err) throw err
+    console.table(res)
     appStart()
+})
 }
 const roles = () => {
-    connection.query() = 'SELECT employees.first_name, employees.last_name,'
-    query += 'role.title AS title FROM employees JOIN role ON employees.role_id = role.id'
-    const result = connection.query(res)
-    console.table(result)
+    connection.query('SELECT employee.first_name, employee.last_name, role.title AS title FROM employee JOIN role ON employee.role_id = role.id;', 
+    (err,res) => {
+        if (err) throw err
+    console.table(res)
     appStart()
+})
 }
 const departments = () => {
-    connection.query() = 'SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee'
-    query += 'JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;'
-    const result = connection.query(res)
-    console.table(result)
-    appStart();
+    connection.query('SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;',
+    (err,res) => {
+        if (err) throw err
+    console.table(res)
+    appStart()
+    })
 }
 const addRole = () => {
     const query = 'SELECT role.title AS title, role.salary AS salary FROM role'
