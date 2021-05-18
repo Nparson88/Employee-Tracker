@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS Employees_db
-CREATE DATABASE Employees_db
+DROP DATABASE IF EXISTS employees_db
+CREATE DATABASE employees_db
 
-USE Employees_db
+USE employees_db
 CREATE TABLE Employee (
     id INT AUTO_INCREMENT PRIMARY KEY
     manager_id INT
@@ -9,7 +9,7 @@ CREATE TABLE Employee (
     first_name VARCHAR(30) NOT NULL
     last_name VARCHAR(30) NOT NULL
     FOREIGN KEY (role_id) REFERENCES role(id),
-    FOREIGN KEY (manager_id) REFERENCES employee(id)
+    FOREIGN KEY (manager_id) REFERENCES Employee(id)
 
 )
 CREATE TABLE Role (
