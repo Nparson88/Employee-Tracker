@@ -79,7 +79,7 @@ const addEmployee = () => {
         },
         {
             type: 'input',
-            name: 'ManageAssign',
+            name: 'manageAssign',
             message: "New employee's managerID",
         }
 
